@@ -14,6 +14,7 @@ using System.Collections.Specialized;
 using TimeTravel.Common;
 using System.Xml.Linq;
 using System.Xml;
+using System.Threading.Tasks;
 
 // The data model defined by this file serves as a representative example of a strongly-typed
 // model that supports notification when members are added, removed, or modified.  The property
@@ -230,7 +231,7 @@ namespace TimeTravel.Data
     /// SampleDataSource initializes with placeholder data rather than live production
     /// data so that sample data is provided at both design-time and run-time.
     /// </summary>
-    public sealed class SampleDataSource
+    public sealed class SampleDataSource : BindableBase
     {
         private static SampleDataSource _sampleDataSource = new SampleDataSource();
 
@@ -238,6 +239,11 @@ namespace TimeTravel.Data
         public ObservableCollection<SampleDataGroup> AllGroups
         {
             get { return this._allGroups; }
+            set
+            {
+                base.SetProperty(ref _allGroups,value);
+
+            }
         }
 
         public static  IEnumerable<SampleDataGroup> GetGroups(string uniqueId)
@@ -265,11 +271,11 @@ namespace TimeTravel.Data
             return null;
         }
 
-        public void FillData()
+        public async Task FillData()
         {
             string WOlFRAM_API_KEY = "RKAJAQ-VAXW9RYV6K";
             string uri = "http://api.wolframalpha.com/v2/query?appid=" + WOlFRAM_API_KEY + "&input=paris%20weather%201989&format=image,plaintext";
-            XDocument xdoc = XDocument.Load(uri);
+            XDocument xdoc = await Task.Run(()=>XDocument.Load(uri));
             var pods = xdoc.Root.Elements("pod");
             string temp = "";
             string temp_img = "";
@@ -283,7 +289,7 @@ namespace TimeTravel.Data
                 if (pod.Attribute("id").Value == "WeatherCharts:WeatherData")
                 {
                     int i = 1;
-                    foreach (XElement subpod in pod.Elements())
+                    foreach (XElement subpod in pod.Elements("subpod"))
                     {
                         
                         group1.Items.Add(new SampleDataItem("Group-1-Item-" + i++,
@@ -297,43 +303,46 @@ namespace TimeTravel.Data
                     }
                 }
             }
-
+            this.AllGroups.Add(group1);
+            
         }
+
+         
 
         public SampleDataSource()
         {
             String ITEM_CONTENT = String.Format("Item Content: {0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}",
                         "Curabitur class aliquam vestibulum nam curae maecenas sed integer cras phasellus suspendisse quisque donec dis praesent accumsan bibendum pellentesque condimentum adipiscing etiam consequat vivamus dictumst aliquam duis convallis scelerisque est parturient ullamcorper aliquet fusce suspendisse nunc hac eleifend amet blandit facilisi condimentum commodo scelerisque faucibus aenean ullamcorper ante mauris dignissim consectetuer nullam lorem vestibulum habitant conubia elementum pellentesque morbi facilisis arcu sollicitudin diam cubilia aptent vestibulum auctor eget dapibus pellentesque inceptos leo egestas interdum nulla consectetuer suspendisse adipiscing pellentesque proin lobortis sollicitudin augue elit mus congue fermentum parturient fringilla euismod feugiat");
             
-            string WOlFRAM_API_KEY = "RKAJAQ-VAXW9RYV6K";
-            string uri = "http://api.wolframalpha.com/v2/query?appid="+WOlFRAM_API_KEY+"&input="+TimeTravel.Common.FormData.City+"%20weather%20"+TimeTravel.Common.FormData.Year+"&format=image,plaintext";
-            XDocument xdoc = XDocument.Load(uri);
-            var pods = xdoc.Root.Elements("pod");
-            string temp = "";
-            string temp_img = "";
-            var group1 = new SampleDataGroup("Group-1",
-                   "Statistics",
-                   TimeTravel.Common.FormData.City + " weather in " + TimeTravel.Common.FormData.Year,
-                   temp_img,
-                   temp);
-            foreach(XElement pod in pods)
-            {
-                if (pod.Attribute("id").Value == "WeatherCharts:WeatherData")
-                {
-                    int i = 1;
-                    foreach (XElement subpod in pod.Elements("subpod"))
-                    {
-                        group1.Items.Add(new SampleDataItem("Group-1-Item-"+i++, 
-                            subpod.Attribute("title").Value,
-                            "Graphical representation of " + subpod.Attribute("title").Value+" over the selected year.",
-                            subpod.Element("img").Attribute("src").Value,                            
-                            ITEM_CONTENT,
-                            subpod.Element("plaintext").Value,
-                            group1));
+            //string WOlFRAM_API_KEY = "RKAJAQ-VAXW9RYV6K";
+            //string uri = "http://api.wolframalpha.com/v2/query?appid="+WOlFRAM_API_KEY+"&input="+TimeTravel.Common.FormData.City+"%20weather%20"+TimeTravel.Common.FormData.Year+"&format=image,plaintext";
+            //XDocument xdoc = XDocument.Load(uri);
+            //var pods = xdoc.Root.Elements("pod");
+            //string temp = "";
+            //string temp_img = "";
+            //var group1 = new SampleDataGroup("Group-1",
+            //       "Statistics",
+            //       TimeTravel.Common.FormData.City + " weather in " + TimeTravel.Common.FormData.Year,
+            //       temp_img,
+            //       temp);
+            //foreach(XElement pod in pods)
+            //{
+            //    if (pod.Attribute("id").Value == "WeatherCharts:WeatherData")
+            //    {
+            //        int i = 1;
+            //        foreach (XElement subpod in pod.Elements("subpod"))
+            //        {
+            //            group1.Items.Add(new SampleDataItem("Group-1-Item-"+i++, 
+            //                subpod.Attribute("title").Value,
+            //                "Graphical representation of " + subpod.Attribute("title").Value+" over the selected year.",
+            //                subpod.Element("img").Attribute("src").Value,                            
+            //                ITEM_CONTENT,
+            //                subpod.Element("plaintext").Value,
+            //                group1));
                         
-                    }
-                }
-            }
+            //        }
+            //    }
+            //}
             
            /*
             group1.Items.Add(new SampleDataItem("Group-1-Item-1",
@@ -372,7 +381,7 @@ namespace TimeTravel.Data
                     ITEM_CONTENT,
                     group1));
             */
-            this.AllGroups.Add(group1);
+            //this.AllGroups.Add(group1);
 
             var group2 = new SampleDataGroup("Group-2",
                     "Group Title: 2",

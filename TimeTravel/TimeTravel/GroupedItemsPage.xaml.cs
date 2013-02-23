@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Popups;
 
 // The Grouped Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234231
 
@@ -37,14 +38,18 @@ namespace TimeTravel
         /// </param>
         /// <param name="pageState">A dictionary of state preserved by this page during an earlier
         /// session.  This will be null the first time a page is visited.</param>
-        protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
+        protected async override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
             SampleDataSource sds = new SampleDataSource();
             //var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
-            //sds.FillData();
+            await sds.FillData();
             var sampleDataGroups = sds.AllGroups;
+
             this.DefaultViewModel["Groups"] = sampleDataGroups;
+            //itemGridView.ItemsSource = sampleDataGroups;
+            MessageDialog dlg = new MessageDialog("Loaded");
+            dlg.ShowAsync();
         }
 
         /// <summary>
