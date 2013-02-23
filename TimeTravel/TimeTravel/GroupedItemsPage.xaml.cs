@@ -40,7 +40,10 @@ namespace TimeTravel
         protected override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
+            SampleDataSource sds = new SampleDataSource();
+            //var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
+            //sds.FillData();
+            var sampleDataGroups = sds.AllGroups;
             this.DefaultViewModel["Groups"] = sampleDataGroups;
         }
 
@@ -71,6 +74,18 @@ namespace TimeTravel
             // by passing required information as a navigation parameter
             var itemId = ((SampleDataItem)e.ClickedItem).UniqueId;
             this.Frame.Navigate(typeof(ItemDetailPage), itemId);
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            TimeTravel.Common.FormData.City = city.Text;
+            TimeTravel.Common.FormData.Year = year.Text;
+            SampleDataSource sds = new SampleDataSource();
+            //var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
+            //sds.FillData();
+            var sampleDataGroups = sds.AllGroups;
+            this.DefaultViewModel["Groups"] = sampleDataGroups;
+             
         }
     }
 }

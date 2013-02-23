@@ -29,7 +29,9 @@
         Style="{StaticResource LayoutRootStyle}"
         DataContext="{Binding Group}"
         d:DataContext="{Binding AllGroups[0], Source={d:DesignInstance Type=data:SampleDataSource, IsDesignTimeCreatable=True}}">
-
+        <Grid.Background>
+            <ImageBrush ImageSource="Assets/backgrnd.png" Stretch="UniformToFill"/>
+        </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="140"/>
             <RowDefinition Height="*"/>
@@ -66,7 +68,7 @@
 
                             <!-- Content is allowed to flow across as many columns as needed -->
                             <common:RichTextColumns x:Name="richTextColumns" Margin="117,0,117,47">
-                                <RichTextBlock x:Name="richTextBlock" Width="560" Style="{StaticResource ItemRichTextStyle}" IsTextSelectionEnabled="False">
+                                <RichTextBlock x:Name="richTextBlock" Width="1100" VerticalAlignment="Top" Style="{StaticResource ItemRichTextStyle}" IsTextSelectionEnabled="False">
                                     <Paragraph>
                                         <Run FontSize="26.667" FontWeight="Light" Text="{Binding Title}"/>
                                         <LineBreak/>
@@ -78,9 +80,9 @@
                                             <Image x:Name="image" MaxHeight="480" Margin="0,20,0,10" Stretch="Uniform" Source="{Binding Image}" AutomationProperties.Name="{Binding Title}"/>
                                         </InlineUIContainer>
                                     </Paragraph>
-                                    <Paragraph>
+                                    <!--<Paragraph>
                                         <Run FontWeight="SemiLight" Text="{Binding Content}"/>
-                                    </Paragraph>
+                                    </Paragraph>-->
                                 </RichTextBlock>
 
                                 <!-- Additional columns are created from this template -->

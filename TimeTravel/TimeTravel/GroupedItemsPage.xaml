@@ -31,9 +31,13 @@
         * Row 1 contains the rest of the page layout
     -->
     <Grid Style="{StaticResource LayoutRootStyle}">
+    	<Grid.Background>
+    		<ImageBrush ImageSource="Assets/backgrnd.png" Stretch="UniformToFill"/>
+    	</Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="140"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
 
         <!-- Horizontal scrolling grid used in most view states -->
@@ -51,7 +55,7 @@
             ItemClick="ItemView_ItemClick">
 
             <GridView.ItemsPanel>
-                <ItemsPanelTemplate>                        
+                <ItemsPanelTemplate>
                     <VirtualizingStackPanel Orientation="Horizontal"/>
                 </ItemsPanelTemplate>
             </GridView.ItemsPanel>
@@ -128,6 +132,9 @@
             <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Grid.Column="1" IsHitTestVisible="false" Style="{StaticResource PageHeaderTextStyle}"/>
         </Grid>
 
+        <TextBox Name="city" Text="City" Width="200" VerticalAlignment="Center" Grid.Row="2" HorizontalAlignment="Left" Margin="120,0,0,0"/>
+        <TextBox Name="year" Text="Year" Width="200" VerticalAlignment="Center"  Grid.Row="2" HorizontalAlignment="Left" Margin="329,0,0,0"/>
+        <Button Content="Go!!" Width="150" Grid.Row="2" Margin="550,0,0,0" HorizontalAlignment="Left" Click="Button_Click_1"/>
         <VisualStateManager.VisualStateGroups>
 
             <!-- Visual states reflect the application's view state -->
