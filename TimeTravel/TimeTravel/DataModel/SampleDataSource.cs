@@ -233,8 +233,15 @@ namespace TimeTravel.Data
     /// </summary>
     public sealed class SampleDataSource : BindableBase
     {
-        private static SampleDataSource _sampleDataSource = new SampleDataSource();
+        private static SampleDataSource _sampleDataSource ;//= new SampleDataSource();
+        public SampleDataSource SampleDataSourceSet
+        { 
+            set
+            {
+                base.SetProperty(ref _sampleDataSource,value);
 
+            }
+        }
         private ObservableCollection<SampleDataGroup> _allGroups = new ObservableCollection<SampleDataGroup>();
         public ObservableCollection<SampleDataGroup> AllGroups
         {
@@ -246,12 +253,12 @@ namespace TimeTravel.Data
             }
         }
 
-        public static  IEnumerable<SampleDataGroup> GetGroups(string uniqueId)
+        public static IEnumerable<SampleDataGroup> GetGroups(string uniqueId)
         {
             if (!uniqueId.Equals("AllGroups")) throw new ArgumentException("Only 'AllGroups' is supported as a collection of groups");
 
             //_sampleDataSource = new SampleDataSource();
-            
+            ///await _sampleDataSource.FillData();
             return _sampleDataSource.AllGroups;
         }
 
@@ -274,14 +281,14 @@ namespace TimeTravel.Data
         public async Task FillData()
         {
             string WOlFRAM_API_KEY = "RKAJAQ-VAXW9RYV6K";
-            string uri = "http://api.wolframalpha.com/v2/query?appid=" + WOlFRAM_API_KEY + "&input=paris%20weather%201989&format=image,plaintext";
+            string uri = "http://api.wolframalpha.com/v2/query?appid=" + WOlFRAM_API_KEY + "&input=" + TimeTravel.Common.FormData.City + "%20weather%20" + TimeTravel.Common.FormData.Year + "&format=image,plaintext";
             XDocument xdoc = await Task.Run(()=>XDocument.Load(uri));
             var pods = xdoc.Root.Elements("pod");
             string temp = "";
             string temp_img = "";
             var group1 = new SampleDataGroup("Group-1",
                    "Statistics",
-                   "Paris Weather in 1989",
+                   TimeTravel.Common.FormData.City + " weather in " + TimeTravel.Common.FormData.Year,
                    temp_img,
                    temp);
             foreach (XElement pod in pods)
@@ -291,15 +298,14 @@ namespace TimeTravel.Data
                     int i = 1;
                     foreach (XElement subpod in pod.Elements("subpod"))
                     {
-                        
                         group1.Items.Add(new SampleDataItem("Group-1-Item-" + i++,
                             subpod.Attribute("title").Value,
-                            "Graphical representation of " + subpod.Attribute("title").Value,
+                            "Graphical representation of " + subpod.Attribute("title").Value + " over the selected year.",
                             subpod.Element("img").Attribute("src").Value,
-                            subpod.Element("plaintext").Value,
                             "Dummy",
+                            subpod.Element("plaintext").Value,
                             group1));
-                        
+
                     }
                 }
             }
@@ -313,9 +319,9 @@ namespace TimeTravel.Data
         {
             String ITEM_CONTENT = String.Format("Item Content: {0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}",
                         "Curabitur class aliquam vestibulum nam curae maecenas sed integer cras phasellus suspendisse quisque donec dis praesent accumsan bibendum pellentesque condimentum adipiscing etiam consequat vivamus dictumst aliquam duis convallis scelerisque est parturient ullamcorper aliquet fusce suspendisse nunc hac eleifend amet blandit facilisi condimentum commodo scelerisque faucibus aenean ullamcorper ante mauris dignissim consectetuer nullam lorem vestibulum habitant conubia elementum pellentesque morbi facilisis arcu sollicitudin diam cubilia aptent vestibulum auctor eget dapibus pellentesque inceptos leo egestas interdum nulla consectetuer suspendisse adipiscing pellentesque proin lobortis sollicitudin augue elit mus congue fermentum parturient fringilla euismod feugiat");
-            
+
             //string WOlFRAM_API_KEY = "RKAJAQ-VAXW9RYV6K";
-            //string uri = "http://api.wolframalpha.com/v2/query?appid="+WOlFRAM_API_KEY+"&input="+TimeTravel.Common.FormData.City+"%20weather%20"+TimeTravel.Common.FormData.Year+"&format=image,plaintext";
+            //string uri = "http://api.wolframalpha.com/v2/query?appid=" + WOlFRAM_API_KEY + "&input=" + TimeTravel.Common.FormData.City + "%20weather%20" + TimeTravel.Common.FormData.Year + "&format=image,plaintext";
             //XDocument xdoc = XDocument.Load(uri);
             //var pods = xdoc.Root.Elements("pod");
             //string temp = "";
@@ -325,21 +331,21 @@ namespace TimeTravel.Data
             //       TimeTravel.Common.FormData.City + " weather in " + TimeTravel.Common.FormData.Year,
             //       temp_img,
             //       temp);
-            //foreach(XElement pod in pods)
+            //foreach (XElement pod in pods)
             //{
             //    if (pod.Attribute("id").Value == "WeatherCharts:WeatherData")
             //    {
             //        int i = 1;
             //        foreach (XElement subpod in pod.Elements("subpod"))
             //        {
-            //            group1.Items.Add(new SampleDataItem("Group-1-Item-"+i++, 
+            //            group1.Items.Add(new SampleDataItem("Group-1-Item-" + i++,
             //                subpod.Attribute("title").Value,
-            //                "Graphical representation of " + subpod.Attribute("title").Value+" over the selected year.",
-            //                subpod.Element("img").Attribute("src").Value,                            
+            //                "Graphical representation of " + subpod.Attribute("title").Value + " over the selected year.",
+            //                subpod.Element("img").Attribute("src").Value,
             //                ITEM_CONTENT,
             //                subpod.Element("plaintext").Value,
             //                group1));
-                        
+
             //        }
             //    }
             //}

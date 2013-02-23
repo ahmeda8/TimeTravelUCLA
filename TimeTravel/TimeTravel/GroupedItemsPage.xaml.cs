@@ -45,11 +45,10 @@ namespace TimeTravel
             //var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
             await sds.FillData();
             var sampleDataGroups = sds.AllGroups;
-
+            sds.SampleDataSourceSet = sds;
             this.DefaultViewModel["Groups"] = sampleDataGroups;
             //itemGridView.ItemsSource = sampleDataGroups;
-            MessageDialog dlg = new MessageDialog("Loaded");
-            dlg.ShowAsync();
+            
         }
 
         /// <summary>
@@ -81,16 +80,16 @@ namespace TimeTravel
             this.Frame.Navigate(typeof(ItemDetailPage), itemId);
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             TimeTravel.Common.FormData.City = city.Text;
             TimeTravel.Common.FormData.Year = year.Text;
             SampleDataSource sds = new SampleDataSource();
             //var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
-            //sds.FillData();
+            await sds.FillData();
             var sampleDataGroups = sds.AllGroups;
+            sds.SampleDataSourceSet = sds;
             this.DefaultViewModel["Groups"] = sampleDataGroups;
-             
         }
     }
 }
