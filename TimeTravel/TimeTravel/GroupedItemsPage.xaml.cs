@@ -51,7 +51,10 @@ namespace TimeTravel
            
             //this.DefaultViewModel["Groups"] = sampleDataGroups;
             ////itemGridView.ItemsSource = sampleDataGroups;
-            LoadData();
+            if (SampleDataSource.GetGroups("AllGroups") != null && SampleDataSource.GetGroups("AllGroups").Count() > 0)
+                this.DefaultViewModel["Groups"] = SampleDataSource.GetGroups("AllGroups");
+            else
+                LoadData();
             
         }
 
