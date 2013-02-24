@@ -473,6 +473,80 @@ namespace TimeTravel.Data
             this.AllGroups.Add(group3);
  
         }
+
+        public async Task FillFinanceData()
+        {
+            var group4 = new SampleDataGroup("Group-4",
+                 "Economic Properties",
+                 "Economic trends for " + TimeTravel.Common.FormData.City,
+                 "",
+                 "");
+
+            string uri = "http://api.wolframalpha.com/v2/query?appid=" + WOlFRAM_API_KEY + "&input=" + TimeTravel.Common.FormData.City + "&format=image,plaintext";
+            XDocument xdoc = await Task.Run(() => XDocument.Load(uri));
+            var pods = xdoc.Root.Elements("pod");
+            string country = pods.ElementAt(0).Element("subpod").Element("plaintext").Value;
+            string[] country_explode = country.Split(',');
+            country = country_explode[country_explode.Count()-1];
+
+
+            uri = "http://api.wolframalpha.com/v2/query?appid=" + WOlFRAM_API_KEY + "&input=economic%20property%20" + country +"%20"+TimeTravel.Common.FormData.Year+ "&format=image,plaintext";
+            xdoc = await Task.Run(() => XDocument.Load(uri));
+            pods = xdoc.Root.Elements("pod");
+            try
+            {
+                foreach (XElement pod in pods)
+                {
+                    foreach (XElement subpod in pod.Elements("subpod"))
+                    {
+                        string img = subpod.Element("img").Attribute("src").Value;
+                        string title = subpod.Element("plaintext").Value;
+                        group4.Items.Add(new SampleDataItem("Group-4-Item-2",
+                                        title,
+                                        "Image of " + title,
+                                        img,
+                                        "",
+                                        "",
+                                        group4));
+                    }
+                }
+            }
+            catch (Exception e)
+            { 
+            }
+
+            uri = "http://api.wolframalpha.com/v2/query?appid=" + WOlFRAM_API_KEY + "&input=dollar%20to%20" + country + "%20currency%20" + TimeTravel.Common.FormData.Year + "&format=image,plaintext";
+            xdoc = await Task.Run(() => XDocument.Load(uri));
+            pods = xdoc.Root.Elements("pod");
+            try
+            {
+                foreach (XElement pod in pods)
+                {
+                    foreach(XElement subpod in pod.Elements("subpod"))
+                    {
+                        if (subpod.Attribute("primary").Value == "true")
+                        {
+                            string img = subpod.Element("img").Attribute("src").Value;
+                            string title = subpod.Element("plaintext").Value;
+                            group4.Items.Add(new SampleDataItem("Group-4-Item-2",
+                                            title,
+                                            "Image of " + title,
+                                            img,
+                                            "",
+                                            "",
+                                            group4));
+                        }
+                    }
+                }
+                
+            }
+            catch (Exception e)
+            {
+            }
+            this.AllGroups.Add(group4);
+ 
+        }
+
         public SampleDataSource()
         {
             String ITEM_CONTENT = String.Format("Item Content: {0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}",

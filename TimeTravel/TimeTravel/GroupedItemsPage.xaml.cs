@@ -61,9 +61,11 @@ namespace TimeTravel
             SampleDataSource sds = new SampleDataSource();
             //var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
 
-            await sds.FillGoogleImages();
-            await sds.FillPeopleData();
-            await sds.FillData();
+            //await sds.FillGoogleImages();
+            //await sds.FillPeopleData();
+            await sds.FillFinanceData();
+            //await sds.FillData();
+
             var sampleDataGroups = sds.AllGroups;
             sds.SampleDataSourceSet = sds;
             city.Text =TimeTravel.Common.FormData.City ;

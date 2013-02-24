@@ -32,7 +32,7 @@
     -->
     <Grid Style="{StaticResource LayoutRootStyle}">
     	<Grid.Background>
-    		<ImageBrush ImageSource="Assets/backgrnd.png" Stretch="UniformToFill"/>
+    		<ImageBrush ImageSource="Assets/NEWbackgrnd.jpg" Stretch="UniformToFill"/>
     	</Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="140"/>
