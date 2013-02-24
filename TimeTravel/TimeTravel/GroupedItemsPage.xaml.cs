@@ -41,16 +41,35 @@ namespace TimeTravel
         protected async override void LoadState(Object navigationParameter, Dictionary<String, Object> pageState)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            SampleDataSource sds = new SampleDataSource();
-            //var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
-            await sds.FillData();
-            var sampleDataGroups = sds.AllGroups;
-            sds.SampleDataSourceSet = sds;
-            this.DefaultViewModel["Groups"] = sampleDataGroups;
-            //itemGridView.ItemsSource = sampleDataGroups;
+            //SampleDataSource sds = new SampleDataSource();
+            ////var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
+            
+            //await sds.FillGoogleImages();
+            //await sds.FillData();
+            //var sampleDataGroups = sds.AllGroups;
+            //sds.SampleDataSourceSet = sds;
+           
+            //this.DefaultViewModel["Groups"] = sampleDataGroups;
+            ////itemGridView.ItemsSource = sampleDataGroups;
+            LoadData();
             
         }
 
+        private async void LoadData()
+        {
+            // TODO: Create an appropriate data model for your problem domain to replace the sample data
+            SampleDataSource sds = new SampleDataSource();
+            //var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
+
+            await sds.FillGoogleImages();
+            await sds.FillPeopleData();
+            await sds.FillData();
+            var sampleDataGroups = sds.AllGroups;
+            sds.SampleDataSourceSet = sds;
+
+            this.DefaultViewModel["Groups"] = sampleDataGroups;
+            //itemGridView.ItemsSource = sampleDataGroups;
+        }
         /// <summary>
         /// Invoked when a group header is clicked.
         /// </summary>
@@ -84,12 +103,7 @@ namespace TimeTravel
         {
             TimeTravel.Common.FormData.City = city.Text;
             TimeTravel.Common.FormData.Year = year.Text;
-            SampleDataSource sds = new SampleDataSource();
-            //var sampleDataGroups = SampleDataSource.GetGroups((String)navigationParameter);
-            await sds.FillData();
-            var sampleDataGroups = sds.AllGroups;
-            sds.SampleDataSourceSet = sds;
-            this.DefaultViewModel["Groups"] = sampleDataGroups;
+            LoadData();
         }
     }
 }

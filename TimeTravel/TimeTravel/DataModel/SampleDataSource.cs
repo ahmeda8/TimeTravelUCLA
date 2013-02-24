@@ -15,6 +15,7 @@ using TimeTravel.Common;
 using System.Xml.Linq;
 using System.Xml;
 using System.Threading.Tasks;
+using System.Net;
 
 // The data model defined by this file serves as a representative example of a strongly-typed
 // model that supports notification when members are added, removed, or modified.  The property
@@ -233,6 +234,13 @@ namespace TimeTravel.Data
     /// </summary>
     public sealed class SampleDataSource : BindableBase
     {
+        //string api_key = "AIzaSyDzfWOPkw1PCAO4wq8RQxvWm0sM0qWlF2Y"; //chrom test user
+        //string cx_key = "001483723543826101534:vf4ehjc7vai"; //chrome test user
+
+        string api_key = "AIzaSyDYq1vrHI2JzRaITzguzi93aV25O_px9pQ"; //abrar here key
+        string cx_key = "000615687005672701274:ig4rtjo79uw"; //abrar here key
+        string WOlFRAM_API_KEY = "RKAJAQ-VAXW9RYV6K";
+
         private static SampleDataSource _sampleDataSource ;//= new SampleDataSource();
         public SampleDataSource SampleDataSourceSet
         { 
@@ -280,7 +288,7 @@ namespace TimeTravel.Data
 
         public async Task FillData()
         {
-            string WOlFRAM_API_KEY = "RKAJAQ-VAXW9RYV6K";
+            //string WOlFRAM_API_KEY = "RKAJAQ-VAXW9RYV6K";
             string uri = "http://api.wolframalpha.com/v2/query?appid=" + WOlFRAM_API_KEY + "&input=" + TimeTravel.Common.FormData.City + "%20weather%20" + TimeTravel.Common.FormData.Year + "&format=image,plaintext";
             XDocument xdoc = await Task.Run(()=>XDocument.Load(uri));
             var pods = xdoc.Root.Elements("pod");
@@ -291,11 +299,12 @@ namespace TimeTravel.Data
                    TimeTravel.Common.FormData.City + " weather in " + TimeTravel.Common.FormData.Year,
                    temp_img,
                    temp);
+            int i = 1;
             foreach (XElement pod in pods)
             {
                 if (pod.Attribute("id").Value == "WeatherCharts:WeatherData")
                 {
-                    int i = 1;
+                   
                     foreach (XElement subpod in pod.Elements("subpod"))
                     {
                         group1.Items.Add(new SampleDataItem("Group-1-Item-" + i++,
@@ -313,8 +322,146 @@ namespace TimeTravel.Data
             
         }
 
-         
+        public async Task FillGoogleImages()
+        {
+            //string api_key = "AIzaSyDzfWOPkw1PCAO4wq8RQxvWm0sM0qWlF2Y";
+            //string cx_key = "001483723543826101534:vf4ehjc7vai";
+            //string uri = "https://www.googleapis.com/customsearch/v1element?searchtype=image&start=0&num=10&client=google-csbe&output=xml_no_dtd&q=" + TimeTravel.Common.FormData.City + "%20landscape%20" + TimeTravel.Common.FormData.Year + "&cx=" + cx_key+"&key="+api_key;
 
+            string uri = "https://www.googleapis.com/customsearch/v1?q=" + TimeTravel.Common.FormData.City + "%20landscape%20" + TimeTravel.Common.FormData.Year + "&cx=" + cx_key + "&key=" + api_key + "&fileType=jpg&alt=atom&imgSize=medium&imgType=photo";
+            //uri = WebUtility.UrlEncode(uri);
+            XDocument xdoc = await Task.Run(()=>(XDocument.Load(uri)));
+            var entrys = xdoc.Root.Nodes();
+            var group2 = new SampleDataGroup("Group-2",
+                   "Landscape",
+                   TimeTravel.Common.FormData.City + " landscape images from year " + TimeTravel.Common.FormData.Year,
+                   "",
+                   "");
+
+            int i = 1;
+            foreach (XElement entry in entrys)
+            {
+               
+                if (entry.Name.LocalName == "entry")
+                {
+                   
+                    string img = "";
+                    XNamespace cse = "http://schemas.google.com/cseapi/2010";
+                    
+                    foreach (XElement dataobject in entry.Element(cse+"PageMap").Elements(cse+"DataObject"))
+                    {
+                        if (dataobject.Attribute("type").Value == "cse_image")
+                        {
+                            img = dataobject.Element(cse+"Attribute").Attribute("value").Value;
+                            break;
+                        }
+                    }
+
+                    string title = "";
+                    string summary = "";
+                    foreach (XElement entry_element in entry.Nodes())
+                    {
+                        if (entry_element.Name.LocalName == "title")
+                            title = entry_element.Value;
+                        if (entry_element.Name.LocalName == "summary")
+                            summary = entry_element.Value;
+                    }
+                    group2.Items.Add(new SampleDataItem("Group-2-Item-" + i++,
+                        title,
+                        "relevant image for the selected era ",
+                        img,
+                        summary,
+                        summary,
+                        group2));
+                }
+            }
+            this.AllGroups.Add(group2);
+        }
+
+        public async Task FillPeopleData()
+        {
+            //string WOlFRAM_API_KEY = "RKAJAQ-VAXW9RYV6K";
+            string uri = "http://api.wolframalpha.com/v2/query?appid=" + WOlFRAM_API_KEY + "&input=notable%20people%20born%20" + TimeTravel.Common.FormData.City +"&format=image,plaintext";
+            XDocument xdoc = await Task.Run(() => XDocument.Load(uri));
+            var pods = xdoc.Root.Elements("pod");
+            string names = "";
+            foreach (XElement pod in pods)
+            {
+                if (pod.Attribute("id").Value == "Result")
+                {
+                    names = pod.Element("subpod").Element("plaintext").Value;
+                    break;
+                }
+            }
+            string[] splitnames = names.Split(new string[]{"\n"}, StringSplitOptions.RemoveEmptyEntries);
+            string[] random_people = new string[10];
+            int i = 0;
+            Random r = new Random();
+            for(int j =0;j<10;j++)
+            {
+                i = r.Next(0, splitnames.Count()-1);
+                int startindex = splitnames[i].IndexOf("(");
+                random_people[j] = splitnames[i].Remove(startindex);
+            }
+
+           // string api_key = "AIzaSyDzfWOPkw1PCAO4wq8RQxvWm0sM0qWlF2Y";
+            //string cx_key = "001483723543826101534:vf4ehjc7vai";
+
+            var group3 = new SampleDataGroup("Group-3",
+                  "Notable people",
+                  "Notable people born in "+TimeTravel.Common.FormData.City,
+                  "",
+                  "");
+
+            foreach (string s in random_people)
+            {
+                string google_uri = "https://www.googleapis.com/customsearch/v1?q="+s+"&cx=" + cx_key + "&key=" + api_key + "&fileType=jpg&alt=atom&imgSize=medium&imgType=photo&num=1";
+                //uri = WebUtility.UrlEncode(uri);
+                xdoc = await Task.Run(() => (XDocument.Load(google_uri)));
+                var entrys = xdoc.Root.Nodes();
+
+                int x = 1;
+                foreach (XElement entry in entrys)
+                {
+
+                    if (entry.Name.LocalName == "entry")
+                    {
+
+                        string img = "";
+                        XNamespace cse = "http://schemas.google.com/cseapi/2010";
+
+                        foreach (XElement dataobject in entry.Element(cse + "PageMap").Elements(cse + "DataObject"))
+                        {
+                            if (dataobject.Attribute("type").Value == "cse_image")
+                            {
+                                img = dataobject.Element(cse + "Attribute").Attribute("value").Value;
+                                break;
+                            }
+                        }
+
+                        string title = "";
+                        string summary = "";
+                        foreach (XElement entry_element in entry.Nodes())
+                        {
+                            if (entry_element.Name.LocalName == "title")
+                                title = entry_element.Value;
+                            if (entry_element.Name.LocalName == "summary")
+                                summary = entry_element.Value;
+                        }
+                        group3.Items.Add(new SampleDataItem("Group-3-Item-" + x++,
+                            title,
+                            "Image of "+title,
+                            img,
+                            summary,
+                            summary,
+                            group3));
+                    }
+                }
+               
+            }
+            this.AllGroups.Add(group3);
+ 
+        }
         public SampleDataSource()
         {
             String ITEM_CONTENT = String.Format("Item Content: {0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}\n\n{0}",
@@ -388,7 +535,7 @@ namespace TimeTravel.Data
                     group1));
             */
             //this.AllGroups.Add(group1);
-
+            /*
             var group2 = new SampleDataGroup("Group-2",
                     "Group Title: 2",
                     "Group Subtitle: 2",
@@ -619,6 +766,7 @@ namespace TimeTravel.Data
                     ITEM_CONTENT,
                     group6));
             this.AllGroups.Add(group6);
+             * */
         }
     }
 }
