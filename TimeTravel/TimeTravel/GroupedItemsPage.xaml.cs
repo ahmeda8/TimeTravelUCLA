@@ -66,6 +66,8 @@ namespace TimeTravel
             await sds.FillData();
             var sampleDataGroups = sds.AllGroups;
             sds.SampleDataSourceSet = sds;
+            city.Text =TimeTravel.Common.FormData.City ;
+            year.Text =TimeTravel.Common.FormData.Year;
 
             this.DefaultViewModel["Groups"] = sampleDataGroups;
             //itemGridView.ItemsSource = sampleDataGroups;

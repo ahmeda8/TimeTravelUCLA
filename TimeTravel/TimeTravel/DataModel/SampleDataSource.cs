@@ -16,6 +16,7 @@ using System.Xml.Linq;
 using System.Xml;
 using System.Threading.Tasks;
 using System.Net;
+using System.Diagnostics;
 
 // The data model defined by this file serves as a representative example of a strongly-typed
 // model that supports notification when members are added, removed, or modified.  The property
@@ -412,7 +413,7 @@ namespace TimeTravel.Data
                   "Notable people born in "+TimeTravel.Common.FormData.City,
                   "",
                   "");
-
+            int x = 1;
             foreach (string s in random_people)
             {
                 string google_uri = "https://www.googleapis.com/customsearch/v1?q="+s+"&cx=" + cx_key + "&key=" + api_key + "&fileType=jpg&alt=atom&imgSize=medium&imgType=photo&num=1";
@@ -420,42 +421,52 @@ namespace TimeTravel.Data
                 xdoc = await Task.Run(() => (XDocument.Load(google_uri)));
                 var entrys = xdoc.Root.Nodes();
 
-                int x = 1;
-                foreach (XElement entry in entrys)
+                try
                 {
-
-                    if (entry.Name.LocalName == "entry")
+                    foreach (XElement entry in entrys)
                     {
 
-                        string img = "";
-                        XNamespace cse = "http://schemas.google.com/cseapi/2010";
-
-                        foreach (XElement dataobject in entry.Element(cse + "PageMap").Elements(cse + "DataObject"))
+                        if (entry.Name.LocalName == "entry")
                         {
-                            if (dataobject.Attribute("type").Value == "cse_image")
+
+                            string img = "";
+                            XNamespace cse = "http://schemas.google.com/cseapi/2010";
+
+                            foreach (XElement dataobject in entry.Element(cse + "PageMap").Elements(cse + "DataObject"))
                             {
-                                img = dataobject.Element(cse + "Attribute").Attribute("value").Value;
-                                break;
+                                if (dataobject.Attribute("type").Value == "cse_image")
+                                {
+                                    img = dataobject.Element(cse + "Attribute").Attribute("value").Value;
+                                    break;
+                                }
                             }
-                        }
 
-                        string title = "";
-                        string summary = "";
-                        foreach (XElement entry_element in entry.Nodes())
-                        {
-                            if (entry_element.Name.LocalName == "title")
-                                title = entry_element.Value;
-                            if (entry_element.Name.LocalName == "summary")
-                                summary = entry_element.Value;
+                            string title = "";
+                            string summary = "";
+                            foreach (XElement entry_element in entry.Nodes())
+                            {
+                                if (entry_element.Name.LocalName == "title")
+                                    title = entry_element.Value;
+                                if (entry_element.Name.LocalName == "summary")
+                                    summary = entry_element.Value;
+                            }
+
+                            group3.Items.Add(new SampleDataItem("Group-3-Item-" + x++,
+                                title,
+                                "Image of " + title,
+                                img,
+                                summary,
+                                summary,
+                                group3));
+
                         }
-                        group3.Items.Add(new SampleDataItem("Group-3-Item-" + x++,
-                            title,
-                            "Image of "+title,
-                            img,
-                            summary,
-                            summary,
-                            group3));
                     }
+                }
+                
+                catch (Exception e)
+                {
+                    Debug.WriteLine("Broken google response");
+                    Debug.WriteLine(xdoc.ToString());
                 }
                
             }
